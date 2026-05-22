@@ -1,0 +1,180 @@
+<div class="app">
+  <div class="bg-orb bg-orb--1"></div>
+  <div class="bg-orb bg-orb--2"></div>
+  <div class="grid-bg"></div>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="logo-transparent.png" alt="Bitcoin Millionaire" class="brand-logo" />
+    </div>
+    <div class="topbar-right">
+      <div class="ticker glass-faint">
+        <span class="ticker-label">BTC / USD</span>
+        <span class="ticker-value">${{ formatLocal(svc.btcPrice()) }}</span>
+        <span class="ticker-dot"></span>
+        <span class="ticker-live">live*</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1 class="hero-title">
+      <p class="hero-line">
+        <span class="hero-lead">If you own</span>
+        <span class="inline-num">
+          <span #sizer class="inline-num-sizer" aria-hidden="true">{{ btcInputValue() }}</span>
+          <input
+            type="number"
+            class="inline-num-input"
+            [value]="btcInputValue()"
+            min="0"
+            [style.width.px]="inputWidth()"
+            (input)="onBtcInput($event)"
+            (focus)="onBtcFocus($event)"
+          />
+        </span>
+        <span class="hero-lead hero-lead--accent">Bitcoin,</span>
+      </p>
+      <p class="hero-line">
+        <span class="hero-lead hero-lead--muted">you are a millionaire in</span>
+        <span class="hero-count">
+          <span class="hero-count-num">{{ displayCount() }}</span>
+          <span class="hero-count-sep">/</span>
+          <span class="hero-count-total">{{ svc.totalCount() }}</span>
+        </span>
+        <span class="hero-lead hero-lead--muted">countries.</span>
+      </p>
+    </h1>
+
+    <div class="hero-stats">
+      <div class="stat glass-faint">
+        <div class="stat-label">Your holding</div>
+        <div class="stat-value">
+          {{ formatLocal(svc.btc()) }}&nbsp;<span class="stat-unit">BTC</span>
+        </div>
+      </div>
+      <div class="stat glass-faint">
+        <div class="stat-label">USD value</div>
+        <div class="stat-value">${{ formatLocal(svc.usdValue()) }}</div>
+      </div>
+      <div class="stat glass-faint">
+        <div class="stat-label">Millionaire in</div>
+        <div class="stat-value">
+          {{ svc.millionaireCount() }}&nbsp;<span class="stat-unit">of {{ svc.totalCount() }}</span>
+        </div>
+      </div>
+      <div class="stat glass-faint">
+        <div class="stat-label">Richest in</div>
+        <div class="stat-value">
+          @if (svc.topCountry()) {
+            {{ svc.topCountry()!.flag }}&nbsp;{{ svc.topCountry()!.code }}
+          } @else {
+            —
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Controls -->
+  <section class="controls">
+    <div class="controls-left">
+      <div class="seg">
+        @for (v of viewOptions; track v.key) {
+          <button
+            class="seg-btn"
+            [class.active]="svc.view() === v.key"
+            (click)="setView(v.key)"
+          >{{ v.label }}</button>
+        }
+      </div>
+      <span class="controls-divider"></span>
+      <span class="controls-meta">Showing</span>
+      <span class="controls-count">{{ showingCount() }}</span>
+      <span class="controls-meta">of {{ svc.totalCount() }}</span>
+    </div>
+    <div class="controls-right">
+      @if (svc.view() === 'list') {
+        <div class="seg">
+          @for (s of sortOptions; track s.key) {
+            <button
+              class="seg-btn"
+              [class.active]="svc.sort() === s.key"
+              (click)="setSort(s.key)"
+            >{{ s.label }}</button>
+          }
+        </div>
+      }
+      <button
+        class="toggle"
+        [class.active]="svc.onlyMillionaire()"
+        (click)="toggleOnlyMillionaire()"
+      >
+        <span class="toggle-dot"></span>
+        <span>Millionaire only</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Results -->
+  @if (svc.view() === 'map') {
+    <app-map-view [onlyMillionaire]="svc.onlyMillionaire()" />
+  } @else {
+    <section class="grid">
+      @for (c of pagedList(); track c.code) {
+        <div class="card" [class.card--win]="c.isMillionaire">
+          <div class="card-top">
+            <span class="flag" role="img" [attr.aria-label]="c.name">{{ c.flag }}</span>
+            <div class="card-id">
+              <div class="card-country">{{ c.name }}</div>
+              <div class="card-code">
+                <span class="card-symbol">{{ c.symbol }}</span>
+                <span class="card-sep">·</span>
+                <span>{{ c.code }}</span>
+              </div>
+            </div>
+            @if (c.isMillionaire) {
+              <span class="badge">Millionaire</span>
+            }
+          </div>
+          <div class="card-value">
+            <span class="value-sym">{{ c.symbol }}</span>
+            <span class="value-num">{{ formatLocal(c.local) }}</span>
+          </div>
+          <div class="card-bar">
+            <div class="card-bar-fill" [style.width]="getPct(c.local)"></div>
+            <div class="card-bar-tick"></div>
+          </div>
+          <div class="card-meta">{{ getCardMeta(c) }}</div>
+        </div>
+      }
+      @if (svc.filteredList().length === 0) {
+        <div class="empty glass">
+          <div class="empty-title">Not yet, anywhere.</div>
+          <div class="empty-sub">Increase your holding to light up the world.</div>
+        </div>
+      }
+    </section>
+
+    @if (pageCount() > 1) {
+      <nav class="pagination">
+        <button class="pg-btn" [disabled]="page() === 0" (click)="goToPage(page() - 1)">‹</button>
+        @for (n of [].constructor(pageCount()); track $index) {
+          <button
+            class="pg-btn"
+            [class.active]="page() === $index"
+            (click)="goToPage($index)"
+          >{{ $index + 1 }}</button>
+        }
+        <button class="pg-btn" [disabled]="page() === pageCount() - 1" (click)="goToPage(page() + 1)">›</button>
+      </nav>
+    }
+  }
+
+  <footer class="footer">
+    <div>* BTC price and FX rates are illustrative.</div>
+    <div>Bitcoin Millionaire · {{ currentYear }}</div>
+  </footer>
+</div>

@@ -1,12 +1,9 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { BitcoinMillionaireComponent } from './bitcoin-millionaire/bitcoin-millionaire.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  imports: [BitcoinMillionaireComponent],
+  template: `<app-bitcoin-millionaire />`,
 })
-export class App {
-  protected readonly title = signal('bitcoin-millionaire');
-}
+export class App {}

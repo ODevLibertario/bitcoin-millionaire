@@ -1,0 +1,93 @@
+@if (loadError()) {
+  <div class="mapview mapview--empty">
+    <div class="mapview-loading">Couldn't load the world map. {{ loadError() }}</div>
+  </div>
+} @else if (!features()) {
+  <div class="mapview mapview--loading">
+    <div class="mapview-loading">
+      <span class="mapview-spinner"></span>
+      <em>Drawing the world…</em>
+    </div>
+  </div>
+} @else {
+  <div class="mapview">
+    <svg
+      class="mapview-svg"
+      [attr.viewBox]="'0 0 ' + MAP_W + ' ' + MAP_H"
+      preserveAspectRatio="xMidYMid meet"
+      (mouseleave)="onMapLeave()"
+    >
+      <defs>
+        <filter id="winShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g class="mapview-graticule">
+        <path [attr.d]="graticule()" />
+      </g>
+
+      <g>
+        @for (f of orderedFeatures(); track f.id) {
+          <path
+            [attr.d]="f.d"
+            [attr.class]="f.cls"
+            [attr.filter]="f.useFilter ? 'url(#winShadow)' : null"
+            (mouseenter)="onMouseEnter(f)"
+            (mouseleave)="onMouseLeave(f)"
+          />
+        }
+      </g>
+    </svg>
+
+    <!-- Legend -->
+    <div class="mapview-legend">
+      <span class="mapview-legend-item">
+        <span class="legend-dot legend-dot--win"></span>
+        <span>Millionaire</span>
+        <span class="legend-count">{{ svc.millionaireCount() }}</span>
+      </span>
+      <span class="mapview-legend-item">
+        <span class="legend-dot legend-dot--dim"></span>
+        <span>Not yet</span>
+        <span class="legend-count">{{ svc.enriched().length - svc.millionaireCount() }}</span>
+      </span>
+      <span class="mapview-legend-hint">Hover any country</span>
+    </div>
+
+    <!-- Hover detail card -->
+    @if (hoveredEntry()) {
+      <div class="mapview-detail">
+        <div class="detail-top">
+          <span class="flag">{{ hoveredEntry()!.flag }}</span>
+          <div class="detail-id">
+            <div class="detail-country">{{ hoveredEntry()!.name }}</div>
+            <div class="detail-code">
+              <span class="card-symbol">{{ hoveredEntry()!.symbol }}</span>
+              <span class="card-sep">·</span>
+              <span>{{ hoveredEntry()!.code }}</span>
+            </div>
+          </div>
+          @if (hoveredEntry()!.isMillionaire) {
+            <span class="badge">Millionaire</span>
+          }
+        </div>
+        <div class="detail-value">
+          <span class="value-sym">{{ hoveredEntry()!.symbol }}</span>
+          <span class="value-num">{{ formatInt(hoveredEntry()!.local) }}</span>
+        </div>
+        <div class="detail-meta">
+          @if (hoveredEntry()!.isMillionaire) {
+            {{ formatCompact(hoveredEntry()!.mult) }}× millionaire
+          } @else {
+            {{ formatCompact(hoveredEntry()!.local) }} of 1,000,000 {{ hoveredEntry()!.code }}
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
