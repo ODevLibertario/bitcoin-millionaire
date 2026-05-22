@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
 import { CURRENCY_META } from '../data/currency-meta';
 
-export type Sort = 'millionaire' | 'high' | 'low' | 'alpha';
+export type Sort = 'high' | 'low' | 'alpha';
 
 export interface EnrichedCountry {
   name: string;
@@ -12,6 +12,8 @@ export interface EnrichedCountry {
   isMillionaire: boolean;
   mult: number;
 }
+
+const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
 const SEED_RATES: Record<string, number> = {
   USD: 1, EUR: 0.93, GBP: 0.79, CHF: 0.90, JPY: 155, CNY: 7.25,
@@ -27,8 +29,8 @@ const SEED_RATES: Record<string, number> = {
 @Injectable({ providedIn: 'root' })
 export class MillionaireService {
   btc = signal<number>(1);
-  btcPrice = signal<number>(Number(localStorage.getItem('btcPrice')) || 105_000);
-  sort = signal<Sort>('millionaire');
+  btcPrice = signal<number>(105_000);
+  sort = signal<Sort>('high');
   onlyMillionaire = signal<boolean>(false);
   view = signal<'list' | 'map'>('list');
 
@@ -53,12 +55,7 @@ export class MillionaireService {
     let list = [...this.enriched()];
     if (this.onlyMillionaire()) list = list.filter(c => c.isMillionaire);
     const sort = this.sort();
-    if (sort === 'millionaire') {
-      list.sort((a, b) => {
-        if (a.isMillionaire !== b.isMillionaire) return a.isMillionaire ? -1 : 1;
-        return b.mult - a.mult;
-      });
-    } else if (sort === 'alpha') {
+    if (sort === 'alpha') {
       list.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sort === 'high') {
       list.sort((a, b) => b.local - a.local);
@@ -76,34 +73,51 @@ export class MillionaireService {
   });
 
   constructor() {
-    effect(() => { localStorage.setItem('btcPrice', String(this.btcPrice())); });
+    this.refresh();
+    setInterval(() => this.refresh(), CACHE_TTL);
+  }
+
+  private refresh(): void {
     void Promise.allSettled([this.fetchBtcPrice(), this.fetchUsdRates()]);
   }
 
   private async fetchBtcPrice(): Promise<void> {
+    const cached = localStorage.getItem('btcPriceCache');
+    if (cached) {
+      const { value, ts } = JSON.parse(cached) as { value: number; ts: number };
+      if (Date.now() - ts < CACHE_TTL) { this.btcPrice.set(value); return; }
+    }
     try {
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
       if (!res.ok) return;
       const data = await res.json() as { bitcoin?: { usd?: unknown } };
       if (typeof data?.['bitcoin']?.['usd'] === 'number') {
-        this.btcPrice.set(data['bitcoin']['usd'] as number);
+        const value = data['bitcoin']['usd'] as number;
+        this.btcPrice.set(value);
+        localStorage.setItem('btcPriceCache', JSON.stringify({ value, ts: Date.now() }));
       }
     } catch {
-      /* keep default / localStorage value */
+      /* keep existing value */
     }
   }
 
   private async fetchUsdRates(): Promise<void> {
+    const cached = localStorage.getItem('usdRatesCache');
+    if (cached) {
+      const { value, ts } = JSON.parse(cached) as { value: Record<string, number>; ts: number };
+      if (Date.now() - ts < CACHE_TTL) { this.usdRates.set(value); return; }
+    }
     try {
       const res = await fetch('https://open.er-api.com/v6/latest/USD');
       if (!res.ok) return;
       const data = await res.json() as { result?: string; rates?: Record<string, unknown> };
       if (data?.result === 'success' && data.rates) {
-        const rates: Record<string, number> = {};
+        const value: Record<string, number> = {};
         for (const [code, val] of Object.entries(data.rates)) {
-          if (typeof val === 'number') rates[code] = val;
+          if (typeof val === 'number') value[code] = val;
         }
-        this.usdRates.set(rates);
+        this.usdRates.set(value);
+        localStorage.setItem('usdRatesCache', JSON.stringify({ value, ts: Date.now() }));
       }
     } catch {
       /* keep seed rates */

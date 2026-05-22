@@ -27,11 +27,10 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
   ] as const;
 
   readonly sortOptions = [
-    { key: 'millionaire', label: 'Millionaire first' },
-    { key: 'high',        label: 'Highest'           },
-    { key: 'low',         label: 'Lowest'            },
-    { key: 'alpha',       label: 'A–Z'               },
-  ] as const;
+    { key: 'high',  label: 'Highest' },
+    { key: 'low',   label: 'Lowest'  },
+    { key: 'alpha', label: 'A–Z'     },
+] as const;
 
   readonly PAGE_SIZE = 24;
   page = signal(0);

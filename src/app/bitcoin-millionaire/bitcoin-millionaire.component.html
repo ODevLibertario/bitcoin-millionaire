@@ -22,7 +22,7 @@
   <section class="hero">
     <h1 class="hero-title">
       <p class="hero-line">
-        <span class="hero-lead">If you own</span>
+        <span class="hero-lead">Owning</span>
         <span class="inline-num">
           <span #sizer class="inline-num-sizer" aria-hidden="true">{{ btcInputValue() }}</span>
           <input
@@ -38,7 +38,7 @@
         <span class="hero-lead hero-lead--accent">Bitcoin,</span>
       </p>
       <p class="hero-line">
-        <span class="hero-lead hero-lead--muted">you are a millionaire in</span>
+        <span class="hero-lead hero-lead--muted">makes you a millionaire in</span>
         <span class="hero-count">
           <span class="hero-count-num">{{ displayCount() }}</span>
           <span class="hero-count-sep">/</span>
@@ -69,7 +69,7 @@
         <div class="stat-label">Richest in</div>
         <div class="stat-value">
           @if (svc.topCountry()) {
-            {{ svc.topCountry()!.flag }}&nbsp;{{ svc.topCountry()!.code }}
+            {{ svc.topCountry()!.flag }}&nbsp;{{ svc.topCountry()!.name }}
           } @else {
             —
           }
