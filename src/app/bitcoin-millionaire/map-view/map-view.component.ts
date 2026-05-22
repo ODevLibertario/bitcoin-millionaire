@@ -39,7 +39,7 @@ export class MapViewComponent implements OnInit {
   features = signal<MapFeature[] | null>(null);
   graticule = signal<string>('');
   loadError = signal<string | null>(null);
-  hovered = signal<string | null>(null);
+  hovered = signal<{ ccyCode: string; geoName: string } | null>(null);
 
   enrichedByCode = computed<Map<string, EnrichedCountry>>(() => {
     const m = new Map<string, EnrichedCountry>();
@@ -49,7 +49,13 @@ export class MapViewComponent implements OnInit {
 
   hoveredEntry = computed<EnrichedCountry | null>(() => {
     const h = this.hovered();
-    return h ? (this.enrichedByCode().get(h) ?? null) : null;
+    if (!h) return null;
+    const base = this.enrichedByCode().get(h.ccyCode) ?? null;
+    if (!base) return null;
+    const specific = this.svc.enriched().find(
+      c => c.code === h.ccyCode && c.name.toLowerCase() === h.geoName.toLowerCase()
+    );
+    return specific ?? base;
   });
 
   orderedFeatures = computed<OrderedFeature[]>(() => {
@@ -61,8 +67,8 @@ export class MapViewComponent implements OnInit {
 
     return [...feats]
       .sort((a, b) => {
-        if (a.ccyCode === h) return 1;
-        if (b.ccyCode === h) return -1;
+        if (h && a.ccyCode === h.ccyCode && a.name === h.geoName) return 1;
+        if (h && b.ccyCode === h.ccyCode && b.name === h.geoName) return -1;
         const aw = a.ccyCode && ebc.get(a.ccyCode)?.isMillionaire ? 1 : 0;
         const bw = b.ccyCode && ebc.get(b.ccyCode)?.isMillionaire ? 1 : 0;
         return aw - bw;
@@ -71,7 +77,7 @@ export class MapViewComponent implements OnInit {
         const enr = f.ccyCode ? ebc.get(f.ccyCode) : undefined;
         const isWin = enr?.isMillionaire ?? false;
         const inData = !!enr;
-        const isHov = f.ccyCode !== null && f.ccyCode === h;
+        const isHov = h !== null && f.ccyCode === h.ccyCode && f.name === h.geoName;
         const isMute = mute && !isWin;
 
         let cls = 'country';
@@ -130,12 +136,13 @@ export class MapViewComponent implements OnInit {
 
   onMouseEnter(f: MapFeature): void {
     if (f.ccyCode && this.enrichedByCode().has(f.ccyCode)) {
-      this.hovered.set(f.ccyCode);
+      this.hovered.set({ ccyCode: f.ccyCode, geoName: f.name });
     }
   }
 
   onMouseLeave(f: MapFeature): void {
-    if (this.hovered() === f.ccyCode) this.hovered.set(null);
+    const h = this.hovered();
+    if (h && h.ccyCode === f.ccyCode && h.geoName === f.name) this.hovered.set(null);
   }
 
   onMapLeave(): void {

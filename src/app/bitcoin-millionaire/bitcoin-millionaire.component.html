@@ -13,7 +13,7 @@
         <span class="ticker-label">BTC / USD</span>
         <span class="ticker-value">${{ formatLocal(svc.btcPrice()) }}</span>
         <span class="ticker-dot"></span>
-        <span class="ticker-live">live*</span>
+        <span class="ticker-live">live</span>
       </div>
     </div>
   </header>
@@ -123,7 +123,7 @@
     <app-map-view [onlyMillionaire]="svc.onlyMillionaire()" />
   } @else {
     <section class="grid">
-      @for (c of pagedList(); track c.code) {
+      @for (c of pagedList(); track c.name) {
         <div class="card" [class.card--win]="c.isMillionaire">
           <div class="card-top">
             <span class="flag" role="img" [attr.aria-label]="c.name">{{ c.flag }}</span>
@@ -174,7 +174,7 @@
   }
 
   <footer class="footer">
-    <div>* BTC price and FX rates are illustrative.</div>
+    <div>* BTC price and FX rates are updated every 30 minutes.</div>
     <div>Bitcoin Millionaire · {{ currentYear }}</div>
   </footer>
 </div>
