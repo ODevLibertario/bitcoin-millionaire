@@ -115,6 +115,14 @@
         <span class="toggle-dot"></span>
         <span>Millionaire only</span>
       </button>
+      <button
+        class="toggle"
+        [class.active]="showChange()"
+        (click)="showChange.update(v => !v)"
+      >
+        <span class="toggle-dot"></span>
+        <span>24h change</span>
+      </button>
     </div>
   </section>
 
@@ -147,7 +155,20 @@
             <div class="card-bar-fill" [style.width]="getPct(c.local)"></div>
             <div class="card-bar-tick"></div>
           </div>
-          <div class="card-meta">{{ getCardMeta(c) }}</div>
+          <div class="card-bottom">
+            <span class="card-meta">{{ getCardMeta(c) }}</span>
+            @if (showChange()) {
+              <span
+                class="card-change"
+                [class.card-change--up]="changeDirection(c.code) === 'up'"
+                [class.card-change--down]="changeDirection(c.code) === 'down'"
+              >
+                <span class="card-change-label">24h</span>
+                <span class="card-change-arrow">{{ changeArrow(c.code) }}</span>
+                <span class="card-change-pct">{{ formatChange(c.code) }}</span>
+              </span>
+            }
+          </div>
         </div>
       }
       @if (svc.filteredList().length === 0) {

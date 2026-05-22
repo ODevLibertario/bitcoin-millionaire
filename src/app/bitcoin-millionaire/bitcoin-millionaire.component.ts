@@ -30,7 +30,9 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
     { key: 'high',  label: 'Highest' },
     { key: 'low',   label: 'Lowest'  },
     { key: 'alpha', label: 'A–Z'     },
-] as const;
+  ] as const;
+
+  showChange = signal(false);
 
   readonly PAGE_SIZE = 24;
   page = signal(0);
@@ -168,5 +170,30 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
     return c.isMillionaire
       ? `${this.formatCompact(c.mult)}× millionaire`
       : `${this.formatCompact(c.local)} of 1,000,000 ${c.code}`;
+  }
+
+  private changeValue(code: string): number | null {
+    const m = this.svc.btcChanges();
+    const v = m[code] ?? m['USD'];
+    return typeof v === 'number' && isFinite(v) ? v : null;
+  }
+
+  formatChange(code: string): string {
+    const v = this.changeValue(code);
+    if (v === null) return '—';
+    const abs = Math.abs(v).toFixed(2);
+    return v >= 0 ? `+${abs}%` : `-${abs}%`;
+  }
+
+  changeArrow(code: string): string {
+    const v = this.changeValue(code);
+    if (v === null || Math.abs(v) < 0.005) return '—';
+    return v > 0 ? '↗' : '↘';
+  }
+
+  changeDirection(code: string): 'up' | 'down' | 'zero' {
+    const v = this.changeValue(code);
+    if (v === null || Math.abs(v) < 0.005) return 'zero';
+    return v > 0 ? 'up' : 'down';
   }
 }

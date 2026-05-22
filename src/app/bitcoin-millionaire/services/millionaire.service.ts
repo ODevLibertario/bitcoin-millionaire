@@ -15,6 +15,14 @@ export interface EnrichedCountry {
 
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 
+const COINGECKO_VS = [
+  'usd', 'eur', 'jpy', 'gbp', 'aud', 'cad', 'chf', 'cny', 'hkd', 'idr',
+  'inr', 'krw', 'mxn', 'myr', 'nok', 'nzd', 'php', 'pkr', 'pln', 'rub',
+  'sek', 'sgd', 'thb', 'try', 'twd', 'zar', 'ars', 'bdt', 'bhd', 'bmd',
+  'brl', 'clp', 'czk', 'dkk', 'huf', 'ils', 'kwd', 'lkr', 'ngn', 'sar',
+  'uah', 'vnd', 'ves', 'gel', 'aed',
+] as const;
+
 const SEED_RATES: Record<string, number> = {
   USD: 1, EUR: 0.93, GBP: 0.79, CHF: 0.90, JPY: 155, CNY: 7.25,
   HKD: 7.83, SGD: 1.35, KRW: 1340, INR: 83, IDR: 15900, THB: 35,
@@ -30,6 +38,7 @@ const SEED_RATES: Record<string, number> = {
 export class MillionaireService {
   btc = signal<number>(0.1);
   btcPrice = signal<number>(105_000);
+  btcChanges = signal<Record<string, number>>({});
   sort = signal<Sort>('high');
   onlyMillionaire = signal<boolean>(false);
   view = signal<'list' | 'map'>('list');
@@ -84,17 +93,31 @@ export class MillionaireService {
   private async fetchBtcPrice(): Promise<void> {
     const cached = localStorage.getItem('btcPriceCache');
     if (cached) {
-      const { value, ts } = JSON.parse(cached) as { value: number; ts: number };
-      if (Date.now() - ts < CACHE_TTL) { this.btcPrice.set(value); return; }
+      const { value, changes, ts } = JSON.parse(cached) as { value: number; changes?: Record<string, number>; ts: number };
+      if (Date.now() - ts < CACHE_TTL) {
+        this.btcPrice.set(value);
+        if (changes) this.btcChanges.set(changes);
+        return;
+      }
     }
     try {
-      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+      const vs = COINGECKO_VS.join(',');
+      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${vs}&include_24hr_change=true`);
       if (!res.ok) return;
-      const data = await res.json() as { bitcoin?: { usd?: unknown } };
-      if (typeof data?.['bitcoin']?.['usd'] === 'number') {
-        const value = data['bitcoin']['usd'] as number;
+      const data = await res.json() as { bitcoin?: Record<string, unknown> };
+      const btcData = data?.['bitcoin'];
+      if (typeof btcData?.['usd'] === 'number') {
+        const value = btcData['usd'] as number;
+        const changes: Record<string, number> = {};
+        for (const [key, val] of Object.entries(btcData)) {
+          if (key.endsWith('_24h_change') && typeof val === 'number') {
+            const code = key.replace('_24h_change', '').toUpperCase();
+            changes[code] = val;
+          }
+        }
         this.btcPrice.set(value);
-        localStorage.setItem('btcPriceCache', JSON.stringify({ value, ts: Date.now() }));
+        this.btcChanges.set(changes);
+        localStorage.setItem('btcPriceCache', JSON.stringify({ value, changes, ts: Date.now() }));
       }
     } catch {
       /* keep existing value */
