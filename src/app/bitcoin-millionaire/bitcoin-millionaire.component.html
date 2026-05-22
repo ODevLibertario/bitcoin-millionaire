@@ -35,7 +35,7 @@
             (focus)="onBtcFocus($event)"
           />
         </span>
-        <span class="hero-lead hero-lead--accent">Bitcoin,</span>
+        <span class="hero-lead hero-lead--accent">{{ svc.btc() > 1 ? 'Bitcoins,' : 'Bitcoin,' }}</span>
       </p>
       <p class="hero-line">
         <span class="hero-lead hero-lead--muted">makes you a millionaire in</span>
