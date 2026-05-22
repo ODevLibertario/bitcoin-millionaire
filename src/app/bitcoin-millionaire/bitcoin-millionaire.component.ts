@@ -19,7 +19,7 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
 
   displayCount = signal(0);
   inputWidth = signal(80);
-  btcInputValue = signal('1');
+  btcInputValue = signal('0.1');
 
   readonly viewOptions = [
     { key: 'list', label: 'List' },
@@ -57,6 +57,22 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
 
   get currentYear(): number { return new Date().getFullYear(); }
 
+  readonly lnAddress = 'odevlibertario@coinos.io';
+  copied = signal(false);
+  private copyTimer: ReturnType<typeof setTimeout> | null = null;
+
+  copyLn(): void {
+    if (this.copyTimer !== null) clearTimeout(this.copyTimer);
+    try {
+      void navigator.clipboard.writeText(this.lnAddress).then(() => {
+        this.copied.set(true);
+        this.copyTimer = setTimeout(() => { this.copied.set(false); this.copyTimer = null; }, 1600);
+      });
+    } catch {
+      /* clipboard unavailable */
+    }
+  }
+
   constructor() {
     let raf: number | null = null;
     let currentDisplay = 0;
@@ -88,11 +104,11 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
     }, { allowSignalWrites: true });
   }
 
-  private lastSizerBtc = NaN;
+  private lastSizerText = '';
   ngAfterViewChecked(): void {
-    const btc = this.svc.btc();
-    if (btc !== this.lastSizerBtc && this.sizerRef?.nativeElement) {
-      this.lastSizerBtc = btc;
+    const text = this.btcInputValue();
+    if (text !== this.lastSizerText && this.sizerRef?.nativeElement) {
+      this.lastSizerText = text;
       const w = Math.max(40, this.sizerRef.nativeElement.offsetWidth + 8);
       if (this.inputWidth() !== w) this.inputWidth.set(w);
     }

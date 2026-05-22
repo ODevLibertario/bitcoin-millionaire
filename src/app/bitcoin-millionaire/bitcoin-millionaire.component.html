@@ -26,10 +26,10 @@
         <span class="inline-num">
           <span #sizer class="inline-num-sizer" aria-hidden="true">{{ btcInputValue() }}</span>
           <input
-            type="number"
+            type="text"
+            inputmode="decimal"
             class="inline-num-input"
             [value]="btcInputValue()"
-            min="0"
             [style.width.px]="inputWidth()"
             (input)="onBtcInput($event)"
             (focus)="onBtcFocus($event)"
@@ -174,7 +174,38 @@
   }
 
   <footer class="footer">
-    <div>* BTC price and FX rates are updated every 30 minutes.</div>
-    <div>Bitcoin Millionaire · {{ currentYear }}</div>
+    <div class="footer-grid">
+
+      <div class="footer-credit">
+        <div class="footer-credit-line">
+          <span class="footer-credit-prefix">Crafted by</span>
+          <a class="footer-credit-link" href="https://x.com/ODevLibertario" target="_blank" rel="noopener noreferrer">
+            O Dev Libertário
+          </a>
+        </div>
+        <div class="footer-meta">* BTC price and FX rates are updated every 30 minutes.</div>
+      </div>
+
+      <div class="footer-support">
+        <div class="footer-support-label">
+          <span class="footer-support-pulse"></span>
+          Tip via Lightning
+        </div>
+        <div class="ln-chip-wrap">
+          <div class="ln-chip-glow"></div>
+          <button
+            class="ln-chip"
+            [class.copied]="copied()"
+            (click)="copyLn()"
+            aria-label="Copy Lightning address"
+          >
+            <span class="ln-chip-icon">⚡</span>
+            <span class="ln-chip-addr">{{ copied() ? 'Copied ✓' : lnAddress }}</span>
+          </button>
+        </div>
+        <div class="footer-brand">Bitcoin Millionaire · {{ currentYear }}</div>
+      </div>
+
+    </div>
   </footer>
 </div>

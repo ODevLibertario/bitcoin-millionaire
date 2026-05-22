@@ -28,7 +28,7 @@ const SEED_RATES: Record<string, number> = {
 
 @Injectable({ providedIn: 'root' })
 export class MillionaireService {
-  btc = signal<number>(1);
+  btc = signal<number>(0.1);
   btcPrice = signal<number>(105_000);
   sort = signal<Sort>('high');
   onlyMillionaire = signal<boolean>(false);
@@ -52,7 +52,7 @@ export class MillionaireService {
   millionaireCount = computed(() => this.enriched().filter(c => c.isMillionaire).length);
 
   filteredList = computed(() => {
-    let list = [...this.enriched()];
+    let list = this.enriched().filter(c => c.local > 0);
     if (this.onlyMillionaire()) list = list.filter(c => c.isMillionaire);
     const sort = this.sort();
     if (sort === 'alpha') {
