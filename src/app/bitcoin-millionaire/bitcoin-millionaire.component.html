@@ -35,7 +35,15 @@
             (focus)="onBtcFocus($event)"
           />
         </span>
-        <span class="hero-lead hero-lead--accent">{{ svc.btc() > 1 ? 'Bitcoins,' : 'Bitcoin,' }}</span>
+        <span
+          class="hero-lead hero-lead--accent hero-lead--swap"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="swapHintLabel()"
+          (click)="toggleUnit()"
+          (keydown.enter)="toggleUnit()"
+          (keydown.space)="toggleUnit()"
+        >{{ unitWord() }},<span class="hero-swap-tooltip">{{ swapHintLabel() }}</span></span>
       </p>
       <p class="hero-line">
         <span class="hero-lead hero-lead--muted">makes you a millionaire in</span>
@@ -52,7 +60,7 @@
       <div class="stat glass-faint">
         <div class="stat-label">Your holding</div>
         <div class="stat-value">
-          {{ formatLocal(svc.btc()) }}&nbsp;<span class="stat-unit">BTC</span>
+          {{ formatLocal(unit() === 'sat' ? svc.btc() * 100_000_000 : svc.btc()) }}&nbsp;<span class="stat-unit">{{ unit() === 'sat' ? 'SAT' : 'BTC' }}</span>
         </div>
       </div>
       <div class="stat glass-faint">

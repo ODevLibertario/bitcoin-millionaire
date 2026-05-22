@@ -154,6 +154,38 @@ body {
 }
 .hero-lead--muted { color: var(--ink-3); }
 .hero-lead--accent { color: var(--btc); }
+.hero-lead--swap {
+  position: relative;
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(247, 147, 26, 0.35);
+  transition: border-color 200ms ease;
+}
+.hero-lead--swap:hover { border-bottom-color: rgba(247, 147, 26, 0.7); }
+.hero-swap-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translate(-50%, 4px);
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(20, 20, 22, 0.92);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  backdrop-filter: blur(8px);
+}
+.hero-lead--swap:hover .hero-swap-tooltip,
+.hero-lead--swap:focus-visible .hero-swap-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
 
 .hero-count {
   font-family: var(--serif);

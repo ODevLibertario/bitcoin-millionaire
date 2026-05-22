@@ -34,6 +34,20 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
 
   showChange = signal(false);
 
+  readonly SATS_PER_BTC = 100_000_000;
+  unit = signal<'btc' | 'sat'>('btc');
+
+  unitWord = computed<string>(() => {
+    const isSat = this.unit() === 'sat';
+    const amount = isSat ? this.svc.btc() * this.SATS_PER_BTC : this.svc.btc();
+    const plural = amount > 1;
+    return isSat ? (plural ? 'Satoshis' : 'Satoshi') : (plural ? 'Bitcoins' : 'Bitcoin');
+  });
+
+  swapHintLabel = computed<string>(() =>
+    this.unit() === 'btc' ? 'Swap to Satoshi' : 'Swap to Bitcoin'
+  );
+
   readonly PAGE_SIZE = 24;
   page = signal(0);
 
@@ -116,11 +130,27 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
     }
   }
 
+  private btcDisplay(btc: number): string {
+    return btc.toFixed(8).replace(/\.?0+$/, '');
+  }
+
+  toggleUnit(): void {
+    if (this.unit() === 'btc') {
+      this.btcInputValue.set(Math.round(this.svc.btc() * this.SATS_PER_BTC).toString());
+      this.unit.set('sat');
+    } else {
+      this.btcInputValue.set(this.btcDisplay(this.svc.btc()));
+      this.unit.set('btc');
+    }
+  }
+
   onBtcInput(e: Event): void {
     const raw = (e.target as HTMLInputElement).value;
     this.btcInputValue.set(raw);
     const v = parseFloat(raw);
-    if (!isNaN(v) && v >= 0) this.svc.btc.set(v);
+    if (!isNaN(v) && v >= 0) {
+      this.svc.btc.set(this.unit() === 'sat' ? v / this.SATS_PER_BTC : v);
+    }
   }
 
   onBtcFocus(e: Event): void {
