@@ -586,6 +586,7 @@ body {
   font-size: 14px;
 }
 .footer-credit-prefix { color: var(--ink-3); }
+.footer-credit-sep { color: var(--ink-4); }
 .footer-credit-link {
   color: var(--btc);
   text-decoration: none;
