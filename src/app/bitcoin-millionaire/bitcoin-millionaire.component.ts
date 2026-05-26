@@ -35,6 +35,12 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
   ] as const;
 
   showChange = signal(false);
+  showBanner = signal(sessionStorage.getItem('bannerDismissed') !== '1');
+
+  dismissBanner(): void {
+    sessionStorage.setItem('bannerDismissed', '1');
+    this.showBanner.set(false);
+  }
 
   readonly SATS_PER_BTC = 100_000_000;
   unit = signal<'btc' | 'sat'>('btc');

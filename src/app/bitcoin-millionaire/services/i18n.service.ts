@@ -57,6 +57,9 @@ const TRANSLATIONS = {
     map_error_unknown:          'Unknown error loading map.',
     map_detail_millionaire:     '× millionaire',
     map_detail_of:              'of',
+    ad_headline:                'Bitcoin Seller',
+    ad_sub:                     "Don't be an ignorant pleb!",
+    ad_cta:                     'Buy BTC →',
   },
   'pt-BR': {
     live:                       'ao vivo',
@@ -103,6 +106,9 @@ const TRANSLATIONS = {
     map_error_unknown:          'Erro desconhecido ao carregar o mapa.',
     map_detail_millionaire:     '× milionário',
     map_detail_of:              'de',
+    ad_headline:                'Vendedor de Bitcoin',
+    ad_sub:                     'Não seja plebe ignara!',
+    ad_cta:                     'Comprar BTC →',
   },
 } as const;
 

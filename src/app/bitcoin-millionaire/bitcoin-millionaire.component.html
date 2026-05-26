@@ -22,6 +22,31 @@
     </div>
   </header>
 
+  <!-- Ad Banner -->
+  @if (showBanner()) {
+    <div class="ad-banner">
+      <div class="ad-banner-inner">
+        <a class="ad-banner-content" href="https://cachorrodepix.com" target="_blank" rel="noopener noreferrer sponsored">
+          <div class="ad-banner-avatar">
+            <img src="ad-banner.jpg" alt="Depix do Cachorro" />
+          </div>
+          <div class="ad-banner-text">
+            <span class="ad-banner-brand">Depix do Cachorro</span>
+            <span class="ad-banner-headline">{{ i18n.t().ad_headline }}</span>
+            <span class="ad-banner-sub">{{ i18n.t().ad_sub }}</span>
+          </div>
+          <div class="ad-banner-methods">
+            <span class="ad-banner-method"><span class="ad-banner-method-icon">💧</span>Liquid</span>
+            <span class="ad-banner-method"><span class="ad-banner-method-icon">⚡</span>Lightning</span>
+            <span class="ad-banner-method"><span class="ad-banner-method-icon">₿</span>Onchain</span>
+          </div>
+          <span class="ad-banner-cta">{{ i18n.t().ad_cta }}</span>
+        </a>
+        <button class="ad-banner-close" (click)="dismissBanner()" aria-label="Dismiss">×</button>
+      </div>
+    </div>
+  }
+
   <!-- Hero -->
   <section class="hero">
     <h1 class="hero-title">

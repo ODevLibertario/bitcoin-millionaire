@@ -123,6 +123,96 @@ body {
   background: rgba(247,147,26,0.12);
 }
 .lang-btn:hover:not(.active) { color: var(--ink); }
+/* ─── Ad Banner ─── */
+.ad-banner {
+  position: relative; z-index: 1;
+  padding: 0 24px;
+  margin-bottom: -8px;
+}
+.ad-banner-inner {
+  display: flex; align-items: center;
+  max-width: 1320px; margin: 0 auto;
+  background: linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--btc);
+  border-radius: 10px;
+  padding: 10px 14px 10px 16px;
+  backdrop-filter: blur(10px);
+  gap: 12px;
+}
+.ad-banner-content {
+  display: flex; align-items: center; gap: 14px;
+  flex: 1; min-width: 0;
+  text-decoration: none; color: inherit;
+}
+.ad-banner-avatar {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid rgba(247,147,26,0.45);
+  box-shadow: 0 0 12px rgba(247,147,26,0.25);
+}
+.ad-banner-avatar img {
+  width: 224%; height: 179%;
+  object-fit: cover;
+  margin-top: -11%;
+  margin-left: -15%;
+}
+.ad-banner-text {
+  display: flex; flex-direction: column; gap: 3px;
+  min-width: 0; flex: 1;
+}
+.ad-banner-brand {
+  font-family: var(--sans); font-size: 16px; font-weight: 700;
+  color: var(--ink); letter-spacing: 0.01em;
+}
+.ad-banner-headline {
+  font-family: var(--serif); font-style: italic;
+  font-size: 15px; color: var(--btc); line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ad-banner-sub {
+  font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
+  letter-spacing: 0.05em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ad-banner-methods {
+  display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+}
+.ad-banner-method {
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 10px; color: var(--ink-3);
+  letter-spacing: 0.04em;
+}
+.ad-banner-method-icon { font-size: 12px; }
+.ad-banner-cta {
+  flex-shrink: 0;
+  padding: 7px 18px; border-radius: 6px;
+  background: rgba(247,147,26,0.12); border: 1px solid rgba(247,147,26,0.3);
+  color: var(--btc); font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.06em; white-space: nowrap;
+  transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.ad-banner-content:hover .ad-banner-cta {
+  background: rgba(247,147,26,0.22); border-color: rgba(247,147,26,0.55);
+  box-shadow: 0 0 12px rgba(247,147,26,0.15);
+}
+.ad-banner-close {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: var(--ink-4); font-size: 18px; line-height: 1;
+  padding: 4px 4px 4px 8px;
+  transition: color 150ms ease;
+}
+.ad-banner-close:hover { color: var(--ink-2); }
+
+@media (max-width: 640px) {
+  .ad-banner-methods { display: none; }
+}
+@media (max-width: 480px) {
+  .ad-banner-headline { display: none; }
+  .ad-banner-sub { display: none; }
+}
+
 .ticker {
   display:flex; align-items:center; gap:10px;
   padding: 7px 14px;
