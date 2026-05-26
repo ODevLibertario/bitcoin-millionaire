@@ -4,6 +4,7 @@ import {
 import { geoNaturalEarth1, geoPath, geoGraticule10 } from 'd3-geo';
 import { feature } from 'topojson-client';
 import { MillionaireService, type EnrichedCountry } from '../services/millionaire.service';
+import { I18nService } from '../services/i18n.service';
 import { CCY_TO_GEO } from '../data/ccy-to-geo';
 
 const MAP_W = 1000;
@@ -33,12 +34,13 @@ export class MapViewComponent implements OnInit {
   readonly MAP_H = MAP_H;
 
   protected svc = inject(MillionaireService);
+  protected i18n = inject(I18nService);
 
   onlyMillionaire = input<boolean>(false);
 
   features = signal<MapFeature[] | null>(null);
   graticule = signal<string>('');
-  loadError = signal<string | null>(null);
+  loadError = signal<'map_error_failed' | 'map_error_unknown' | null>(null);
   hovered = signal<{ ccyCode: string; geoName: string } | null>(null);
 
   enrichedByCode = computed<Map<string, EnrichedCountry>>(() => {
@@ -99,7 +101,7 @@ export class MapViewComponent implements OnInit {
       let topo: any = cached;
       if (!topo) {
         const res = await fetch('https://unpkg.com/world-atlas@2.0.2/countries-110m.json');
-        if (!res.ok) throw new Error('Failed to load world map data');
+        if (!res.ok) { this.loadError.set('map_error_failed'); return; }
         topo = await res.json();
         win['__worldTopo'] = topo;
       }
@@ -129,8 +131,8 @@ export class MapViewComponent implements OnInit {
         .filter((f: MapFeature) => f.d.length > 0);
 
       this.features.set(feats);
-    } catch (e: unknown) {
-      this.loadError.set(e instanceof Error ? e.message : 'Unknown error loading map');
+    } catch {
+      this.loadError.set('map_error_unknown');
     }
   }
 
@@ -151,11 +153,11 @@ export class MapViewComponent implements OnInit {
 
   formatCompact(value: number): string {
     if (!isFinite(value)) return '—';
-    return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+    return new Intl.NumberFormat(this.i18n.locale(), { notation: 'compact', maximumFractionDigits: 2 }).format(value);
   }
 
   formatInt(value: number): string {
     if (!isFinite(value)) return '—';
-    return new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat(this.i18n.locale(), { maximumFractionDigits: 0 }).format(value);
   }
 }

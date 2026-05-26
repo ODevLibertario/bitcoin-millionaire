@@ -1,12 +1,12 @@
 @if (loadError()) {
   <div class="mapview mapview--empty">
-    <div class="mapview-loading">Couldn't load the world map. {{ loadError() }}</div>
+    <div class="mapview-loading">{{ i18n.t()[loadError()!] }}</div>
   </div>
 } @else if (!features()) {
   <div class="mapview mapview--loading">
     <div class="mapview-loading">
       <span class="mapview-spinner"></span>
-      <em>Drawing the world…</em>
+      <em>{{ i18n.t().map_loading }}</em>
     </div>
   </div>
 } @else {
@@ -48,15 +48,15 @@
     <div class="mapview-legend">
       <span class="mapview-legend-item">
         <span class="legend-dot legend-dot--win"></span>
-        <span>Millionaire</span>
+        <span>{{ i18n.t().map_legend_millionaire }}</span>
         <span class="legend-count">{{ svc.millionaireCount() }}</span>
       </span>
       <span class="mapview-legend-item">
         <span class="legend-dot legend-dot--dim"></span>
-        <span>Not yet</span>
+        <span>{{ i18n.t().map_legend_not_yet }}</span>
         <span class="legend-count">{{ svc.enriched().length - svc.millionaireCount() }}</span>
       </span>
-      <span class="mapview-legend-hint">Hover over any country</span>
+      <span class="mapview-legend-hint">{{ i18n.t().map_legend_hover }}</span>
     </div>
 
     <!-- Hover detail card -->
@@ -73,7 +73,7 @@
             </div>
           </div>
           @if (hoveredEntry()!.isMillionaire) {
-            <span class="badge">Millionaire</span>
+            <span class="badge">{{ i18n.t().map_legend_millionaire }}</span>
           }
         </div>
         <div class="detail-value">
@@ -82,9 +82,9 @@
         </div>
         <div class="detail-meta">
           @if (hoveredEntry()!.isMillionaire) {
-            {{ formatCompact(hoveredEntry()!.mult) }}× millionaire
+            {{ formatCompact(hoveredEntry()!.mult) }}{{ i18n.t().map_detail_millionaire }}
           } @else {
-            {{ formatCompact(hoveredEntry()!.local) }} of 1,000,000 {{ hoveredEntry()!.code }}
+            {{ formatCompact(hoveredEntry()!.local) }} {{ i18n.t().map_detail_of }} {{ formatInt(1_000_000) }} {{ hoveredEntry()!.code }}
           }
         </div>
       </div>

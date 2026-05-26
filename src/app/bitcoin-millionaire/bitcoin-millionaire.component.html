@@ -9,11 +9,15 @@
       <img src="logo-transparent.png" alt="Bitcoin Millionaire" class="brand-logo" />
     </div>
     <div class="topbar-right">
+      <div class="lang-switch">
+        <button class="lang-btn" [class.active]="i18n.locale() === 'en-US'" (click)="i18n.setLocale('en-US')">EN</button>
+        <button class="lang-btn" [class.active]="i18n.locale() === 'pt-BR'" (click)="i18n.setLocale('pt-BR')">PT</button>
+      </div>
       <div class="ticker glass-faint">
         <span class="ticker-label">BTC / USD</span>
         <span class="ticker-value">${{ formatLocal(svc.btcPrice()) }}</span>
         <span class="ticker-dot"></span>
-        <span class="ticker-live">live</span>
+        <span class="ticker-live">{{ i18n.t().live }}</span>
       </div>
     </div>
   </header>
@@ -22,7 +26,7 @@
   <section class="hero">
     <h1 class="hero-title">
       <p class="hero-line">
-        <span class="hero-lead">Owning</span>
+        <span class="hero-lead">{{ i18n.t().hero_owning }}</span>
         <span class="inline-num">
           <span #sizer class="inline-num-sizer" aria-hidden="true">{{ btcInputValue() }}</span>
           <input
@@ -46,35 +50,35 @@
         >{{ unitWord() }},<span class="hero-swap-tooltip">{{ swapHintLabel() }}</span></span>
       </p>
       <p class="hero-line">
-        <span class="hero-lead hero-lead--muted">makes you a millionaire in</span>
+        <span class="hero-lead hero-lead--muted">{{ i18n.t().hero_makes_millionaire }}</span>
         <span class="hero-count">
           <span class="hero-count-num">{{ displayCount() }}</span>
           <span class="hero-count-sep">/</span>
           <span class="hero-count-total">{{ svc.totalCount() }}</span>
         </span>
-        <span class="hero-lead hero-lead--muted">countries.</span>
+        <span class="hero-lead hero-lead--muted">{{ i18n.t().hero_countries }}</span>
       </p>
     </h1>
 
     <div class="hero-stats">
       <div class="stat glass-faint">
-        <div class="stat-label">Your holding</div>
+        <div class="stat-label">{{ i18n.t().stat_holding }}</div>
         <div class="stat-value">
           {{ formatLocal(unit() === 'sat' ? svc.btc() * 100_000_000 : svc.btc()) }}&nbsp;<span class="stat-unit">{{ unit() === 'sat' ? 'SAT' : 'BTC' }}</span>
         </div>
       </div>
       <div class="stat glass-faint">
-        <div class="stat-label">USD value</div>
+        <div class="stat-label">{{ i18n.t().stat_usd_value }}</div>
         <div class="stat-value">${{ formatLocal(svc.usdValue()) }}</div>
       </div>
       <div class="stat glass-faint">
-        <div class="stat-label">Millionaire in</div>
+        <div class="stat-label">{{ i18n.t().stat_millionaire_in }}</div>
         <div class="stat-value">
-          {{ svc.millionaireCount() }}&nbsp;<span class="stat-unit">of {{ svc.totalCount() }}</span>
+          {{ svc.millionaireCount() }}&nbsp;<span class="stat-unit">{{ i18n.t().stat_of }} {{ svc.totalCount() }}</span>
         </div>
       </div>
       <div class="stat glass-faint">
-        <div class="stat-label">Richest in</div>
+        <div class="stat-label">{{ i18n.t().stat_richest_in }}</div>
         <div class="stat-value">
           @if (svc.topCountry()) {
             {{ svc.topCountry()!.flag }}&nbsp;{{ svc.topCountry()!.name }}
@@ -95,13 +99,13 @@
             class="seg-btn"
             [class.active]="svc.view() === v.key"
             (click)="setView(v.key)"
-          >{{ v.label }}</button>
+          >{{ tLabel(v.key) }}</button>
         }
       </div>
       <span class="controls-divider"></span>
-      <span class="controls-meta">Showing</span>
+      <span class="controls-meta">{{ i18n.t().controls_showing }}</span>
       <span class="controls-count">{{ showingCount() }}</span>
-      <span class="controls-meta">of {{ svc.totalCount() }}</span>
+      <span class="controls-meta">{{ i18n.t().controls_of }} {{ svc.totalCount() }}</span>
     </div>
     <div class="controls-right">
       @if (svc.view() === 'list') {
@@ -111,7 +115,7 @@
               class="seg-btn"
               [class.active]="svc.sort() === s.key"
               (click)="setSort(s.key)"
-            >{{ s.label }}</button>
+            >{{ tLabel(s.key) }}</button>
           }
         </div>
       }
@@ -121,7 +125,7 @@
         (click)="toggleOnlyMillionaire()"
       >
         <span class="toggle-dot"></span>
-        <span>Millionaire only</span>
+        <span>{{ i18n.t().toggle_millionaire_only }}</span>
       </button>
       <button
         class="toggle"
@@ -129,7 +133,7 @@
         (click)="showChange.update(v => !v)"
       >
         <span class="toggle-dot"></span>
-        <span>24h change</span>
+        <span>{{ i18n.t().toggle_24h_change }}</span>
       </button>
     </div>
   </section>
@@ -152,7 +156,7 @@
               </div>
             </div>
             @if (c.isMillionaire) {
-              <span class="badge">Millionaire</span>
+              <span class="badge">{{ i18n.t().badge_millionaire }}</span>
             }
           </div>
           <div class="card-value">
@@ -171,7 +175,7 @@
                 [class.card-change--up]="changeDirection(c.code) === 'up'"
                 [class.card-change--down]="changeDirection(c.code) === 'down'"
               >
-                <span class="card-change-label">24h</span>
+                <span class="card-change-label">{{ i18n.t().card_24h_label }}</span>
                 <span class="card-change-arrow">{{ changeArrow(c.code) }}</span>
                 <span class="card-change-pct">{{ formatChange(c.code) }}</span>
               </span>
@@ -181,8 +185,8 @@
       }
       @if (svc.filteredList().length === 0) {
         <div class="empty glass">
-          <div class="empty-title">Not yet, anywhere.</div>
-          <div class="empty-sub">Increase your holding to light up the world.</div>
+          <div class="empty-title">{{ i18n.t().empty_title }}</div>
+          <div class="empty-sub">{{ i18n.t().empty_sub }}</div>
         </div>
       }
     </section>
@@ -207,22 +211,22 @@
 
       <div class="footer-credit">
         <div class="footer-credit-line">
-          <span class="footer-credit-prefix">Crafted by</span>
+          <span class="footer-credit-prefix">{{ i18n.t().footer_crafted_by }}</span>
           <a class="footer-credit-link" href="https://x.com/ODevLibertario" target="_blank" rel="noopener noreferrer">
             O Dev Libertário
           </a>
           <span class="footer-credit-sep">·</span>
           <a class="footer-credit-link" href="https://github.com/ODevLibertario/bitcoin-millionaire" target="_blank" rel="noopener noreferrer">
-            Source Code
+            {{ i18n.t().footer_source_code }}
           </a>
         </div>
-        <div class="footer-meta">* BTC price and FX rates are updated every 30 minutes.</div>
+        <div class="footer-meta">{{ i18n.t().footer_disclaimer }}</div>
       </div>
 
       <div class="footer-support">
         <div class="footer-support-label">
           <span class="footer-support-pulse"></span>
-          Tip via Lightning
+          {{ i18n.t().footer_tip_lightning }}
         </div>
         <div class="ln-chip-wrap">
           <div class="ln-chip-glow"></div>
@@ -230,10 +234,10 @@
             class="ln-chip"
             [class.copied]="copied()"
             (click)="copyLn()"
-            aria-label="Copy Lightning address"
+            [attr.aria-label]="i18n.t().footer_copy_aria"
           >
             <span class="ln-chip-icon">⚡</span>
-            <span class="ln-chip-addr">{{ copied() ? 'Copied ✓' : lnAddress }}</span>
+            <span class="ln-chip-addr">{{ copied() ? i18n.t().footer_copied : lnAddress }}</span>
           </button>
         </div>
         <div class="footer-brand">Bitcoin Millionaire · {{ currentYear }}</div>

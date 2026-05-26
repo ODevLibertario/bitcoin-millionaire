@@ -95,6 +95,31 @@ body {
   filter: drop-shadow(0 8px 28px rgba(247,147,26,0.20));
 }
 .topbar-right { display:flex; align-items:center; gap:12px; }
+.lang-switch {
+  display: flex;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.lang-btn {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 5px;
+  color: var(--ink-3);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+.lang-btn.active {
+  color: var(--btc);
+  background: rgba(247,147,26,0.12);
+}
+.lang-btn:hover:not(.active) { color: var(--ink); }
 .ticker {
   display:flex; align-items:center; gap:10px;
   padding: 7px 14px;

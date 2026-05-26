@@ -3,6 +3,7 @@ import {
   effect, inject, ViewChild, ElementRef, AfterViewChecked
 } from '@angular/core';
 import { MillionaireService, type Sort, type EnrichedCountry } from './services/millionaire.service';
+import { I18nService } from './services/i18n.service';
 import { MapViewComponent } from './map-view/map-view.component';
 
 @Component({
@@ -14,6 +15,7 @@ import { MapViewComponent } from './map-view/map-view.component';
 })
 export class BitcoinMillionaireComponent implements AfterViewChecked {
   protected svc = inject(MillionaireService);
+  protected i18n = inject(I18nService);
 
   @ViewChild('sizer') sizerRef?: ElementRef<HTMLSpanElement>;
 
@@ -38,14 +40,14 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
   unit = signal<'btc' | 'sat'>('btc');
 
   unitWord = computed<string>(() => {
-    const isSat = this.unit() === 'sat';
-    const amount = isSat ? this.svc.btc() * this.SATS_PER_BTC : this.svc.btc();
-    const plural = amount > 1;
-    return isSat ? (plural ? 'Satoshis' : 'Satoshi') : (plural ? 'Bitcoins' : 'Bitcoin');
+    const amount = this.unit() === 'sat'
+      ? this.svc.btc() * this.SATS_PER_BTC
+      : this.svc.btc();
+    return this.i18n.unitWord(amount, this.unit());
   });
 
   swapHintLabel = computed<string>(() =>
-    this.unit() === 'btc' ? 'Swap to Satoshi' : 'Swap to Bitcoin'
+    this.unit() === 'btc' ? this.i18n.t().swap_to_sat : this.i18n.t().swap_to_btc
   );
 
   readonly PAGE_SIZE = 24;
@@ -183,13 +185,24 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
       : abs >= 100
       ? { maximumFractionDigits: 0 }
       : { maximumFractionDigits: 2 };
-    try { return new Intl.NumberFormat('en-US', opts).format(value); }
+    try { return new Intl.NumberFormat(this.i18n.locale(), opts).format(value); }
     catch { return String(Math.round(value)); }
   }
 
   formatCompact(value: number): string {
     if (!isFinite(value)) return '—';
-    return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+    return new Intl.NumberFormat(this.i18n.locale(), { notation: 'compact', maximumFractionDigits: 2 }).format(value);
+  }
+
+  tLabel(key: string): string {
+    const map: Record<string, string> = {
+      list:  this.i18n.t().view_list,
+      map:   this.i18n.t().view_map,
+      high:  this.i18n.t().sort_high,
+      low:   this.i18n.t().sort_low,
+      alpha: this.i18n.t().sort_alpha,
+    };
+    return map[key] ?? key;
   }
 
   getPct(local: number): string {
@@ -197,9 +210,10 @@ export class BitcoinMillionaireComponent implements AfterViewChecked {
   }
 
   getCardMeta(c: EnrichedCountry): string {
+    const t = this.i18n.t();
     return c.isMillionaire
-      ? `${this.formatCompact(c.mult)}× millionaire`
-      : `${this.formatCompact(c.local)} of 1,000,000 ${c.code}`;
+      ? `${this.formatCompact(c.mult)}${t.card_meta_millionaire}`
+      : `${this.formatCompact(c.local)} ${t.card_meta_of} ${this.formatLocal(1_000_000)} ${c.code}`;
   }
 
   private changeValue(code: string): number | null {
