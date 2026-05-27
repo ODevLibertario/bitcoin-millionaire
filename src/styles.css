@@ -127,7 +127,6 @@ body {
 .ad-banner {
   position: relative; z-index: 1;
   padding: 0 24px;
-  margin-bottom: -8px;
 }
 .ad-banner-inner {
   display: flex; align-items: center;
@@ -208,9 +207,20 @@ body {
 @media (max-width: 640px) {
   .ad-banner-methods { display: none; }
 }
-@media (max-width: 480px) {
-  .ad-banner-headline { display: none; }
-  .ad-banner-sub { display: none; }
+@media (max-width: 560px) {
+  .ad-banner-inner { flex-direction: column; align-items: stretch; padding: 14px 14px 12px; }
+  .ad-banner-content { flex-wrap: wrap; justify-content: center; text-align: center; gap: 10px; }
+  .ad-banner-avatar { margin: 0 auto; }
+  .ad-banner-text { flex: 1 1 100%; align-items: center; }
+  .ad-banner-cta {
+    flex: 1 1 100%;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .ad-banner-close {
+    position: absolute; top: 8px; right: 10px;
+    padding: 0;
+  }
 }
 
 .ticker {
